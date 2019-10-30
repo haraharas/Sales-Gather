@@ -1,0 +1,86 @@
+{% extends "./_base.html" %}
+{% block content %}
+{% load crispy_forms_tags %}
+{% load humanize %}
+<div class="container">
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">検索条件</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="filter" method="get">
+                    <div class="modal-body">
+                        {{filter.form|crispy}}
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <a class="btn btn-outline-secondary" data-dismiss="modal">戻る</a>
+                    <button type="submit" class="btn btn-outline-secondary" form="filter">検索</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <a class="btn btn-secondary filtered" style="visibility:hidden" href="/?page=1">検索を解除</a>
+            <div class="float-right">
+                <a class="btn btn-outline-secondary" href="{% url 'create' %}">新規</a>
+                <a class="btn btn-outline-secondary" data-toggle="modal" data-target="#myModal" href="#">検索</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            {% include "./_pagination.html" %}
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th scope="col">部署名</th>
+                <th scope="col">売上日</th>
+                <th scope="col">売上高</th>
+                <th scope="col">仕入額</th>
+                <th class="visible-lg" scope="col">更新時間</th>
+            </tr>
+        </thead>
+        {% for sale in sale_list %}
+        <tbody>
+            <tr>
+                <td>
+                    <div>
+                        <a class="btn btn-outline-secondary " href="{% url 'detail' sale.pk %}">詳細</a>
+                        <a class="btn btn-outline-secondary " href="{% url 'update' sale.pk %}">編集</a>
+                        <a class="btn btn-outline-secondary " href="{% url 'delete' sale.pk %}">削除</a>
+                    </div>
+                </td>
+                <td>{{ sale.get_store_display }}</td>
+                <td>{{ sale.sale_date|date:"Y/m/d" }}</td>
+                <td>{{ sale.sale|intcomma }}円</td>
+                <td>{{ sale.cost|intcomma }}円</td>
+                <td class="visible-lg">{{ sale.created_at}}</td>
+            </tr>
+            {% empty %}
+            <li>
+                対象のデータがありません
+            </li>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="float-right">
+                <a class="btn btn-outline-secondary" href="{% url 'create' %}">新規</a>
+                <a class="btn btn-outline-secondary" data-toggle="modal" data-target="#myModal" href="#">検索</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+<div class="row">
+    <div class="col-3">
+        <p>店舗名</p>
+    </div>
+    <div class="col-9">
+        <p>{{ sale.get_store_display }}</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-3">
+        <p>登録日</p>
+    </div>
+    <div class="col-9">
+        <p>{{ sale.sale_date }}</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-3">
+        <p>当日売上額</p>
+    </div>
+    <div class="col-9">
+        <p>{{ sale.sale }}円</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-3">
+        <p>当日仕入額</p>
+    </div>
+    <div class="col-9">
+        <p>{{ sale.cost }}円</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-3">
+        <p>更新日</p>
+    </div>
+    <div class="col-9">
+        <p>{{ sale.created_at|date:"Y/m/d G:i:s" }}</p>
+    </div>
+</div>
