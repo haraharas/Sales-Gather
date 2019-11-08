@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'r8c(c*+!&s=(aee6$b5&ve^zi5-_gn^4dbduw#c(+d1ttq9#k8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -130,3 +130,6 @@ LOGOUT_REDIRECT_URL = '/'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # 3桁区切り
 NUMBER_GROUPING = 3
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
