@@ -62,6 +62,7 @@ class SaleDeleteView(LoginRequiredMixin, DeleteView):
 # 月集計
 class SaleMonthView(LoginRequiredMixin, FilterView):
     model = Sale
+    template_name = "sale_month.html"
     filterset_class = SaleFilter
     # デフォルトの並び順を新しい順とする
     queryset = Sale.objects.all().order_by('-created_at')

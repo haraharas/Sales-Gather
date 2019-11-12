@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import SaleFilterView, SaleDetailView, SaleCreateView, SaleUpdateView, SaleDeleteView
+from .views import SaleFilterView, SaleDetailView, SaleCreateView, SaleUpdateView, SaleDeleteView, SaleMonthView
 
 urlpatterns = [
     # 一覧画面
@@ -13,5 +13,5 @@ urlpatterns = [
     # 削除画面
     path('delete/<int:pk>/', SaleDeleteView.as_view(), name='delete'),
     # 一覧画面
-    path('',  SaleFilterView.as_view(), name='month'),
+    path('month/',  SaleMonthView.as_view(), name='month'),
 ]
