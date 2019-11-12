@@ -12,4 +12,6 @@ urlpatterns = [
     path('update/<int:pk>/', SaleUpdateView.as_view(), name='update'),
     # 削除画面
     path('delete/<int:pk>/', SaleDeleteView.as_view(), name='delete'),
+    # 一覧画面
+    path('',  SaleFilterView.as_view(), name='month'),
 ]
