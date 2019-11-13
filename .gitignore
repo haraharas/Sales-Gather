@@ -1,2 +1,4 @@
 db.sqlite3
 app/__pycache__/
+project/__pycache__/
+app/templatetags/__pycache__/
