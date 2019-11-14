@@ -2,6 +2,7 @@
 {% block content %}
 {% load crispy_forms_tags %}
 {% load humanize %}
+{% load sale_extras %}
 <div class="container">
     <div id="myModal" class="modal fade" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
@@ -26,7 +27,7 @@
     </div>
     <div class="row">
         <div class="col-12">
-            <a class="btn btn-secondary filtered" style="visibility:hidden" href="/?page=1">検索を解除</a>
+            <a class="btn btn-secondary filtered" style="visibility:hidden" href="/month/?page=1">検索を解除</a>
             <div class="float-right">
                 <a class="btn btn-outline-secondary" href="{% url 'create' %}">新規</a>
                 <a class="btn btn-outline-secondary" data-toggle="modal" data-target="#myModal" href="#">検索</a>
@@ -40,6 +41,7 @@
         </div>
     </div>
     <table class="table">
+        <h3>aa</h3>
         <thead>
             <tr>
                 <th scope="col">売上日</th>
@@ -52,8 +54,9 @@
         <tbody>
             <tr>
                 <td>{{ sale.sale_date|date:"Y/m/d" }}</td>
-                <td>{{ sale.sale|intcomma }}円</td>
-                <td>{{ sale.cost|intcomma }}円</td>
+                <td>{{ sale.sale | intcomma }}円</td>
+                <td>{{ sale.cost | intcomma }}円</td>
+                <td>{{ sale.sale | profit:sale.cost|intcomma }}円</td>
             </tr>
             {% empty %}
             <li>
