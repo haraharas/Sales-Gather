@@ -12,3 +12,15 @@ class SaleFilter(FilterSet):
 
         model = Sale
         fields = ('store', 'sale_date', 'sale', 'cost',)
+
+
+class SaleFilter_Month(FilterSet):
+    sale_date_year = filters.NumberFilter(
+        label='年', field_name='sale_date', lookup_expr='year')
+    sale_date_month = filters.NumberFilter(
+        label='月', field_name='sale_date', lookup_expr='month')
+
+    class Meta:
+
+        model = Sale
+        fields = ('store', 'sale_date_year', 'sale_date_month')

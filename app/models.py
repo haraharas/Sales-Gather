@@ -24,7 +24,6 @@ class Sale(models.Model):
 
     sale_date = models.DateField(
         verbose_name='売上日',
-        default=timezone.datetime.today(),
     )
 
     sale = models.IntegerField(

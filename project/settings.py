@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'app',  # 追加
     'bootstrap_datepicker_plus',
     'django.contrib.humanize',
+    'account',
 ]
 
 
@@ -136,3 +137,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'app/static/'),  # 開発中に使っていたstaticディレクトリ
 )
+
+AUTH_USER_MODEL = 'account.User'

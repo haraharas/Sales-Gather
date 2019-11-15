@@ -1,11 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django_filters.views import FilterView
+from django_filters import rest_framework as filters
 
 from .models import Sale
-from .filters import SaleFilter
+from .filters import SaleFilter, SaleFilter_Month
 from .forms import SaleForm
 
 
@@ -36,9 +37,11 @@ class SaleFilterView(LoginRequiredMixin, FilterView):
 
 class SaleDetailView(LoginRequiredMixin, DetailView):
     model = Sale
-
+    success_url = reverse_lazy('index')
 
 # 登録画面
+
+
 class SaleCreateView(LoginRequiredMixin, CreateView):
     model = Sale
     form_class = SaleForm
@@ -57,3 +60,11 @@ class SaleUpdateView(LoginRequiredMixin, UpdateView):
 class SaleDeleteView(LoginRequiredMixin, DeleteView):
     model = Sale
     success_url = reverse_lazy('index')
+
+
+# 月集計
+class SaleMonthView(LoginRequiredMixin, FilterView):
+    model = Sale
+    template_name = "app/sale_month.html"
+    filterset_class = SaleFilter_Month
+    queryset = Sale.objects.all().order_by('created_at')
