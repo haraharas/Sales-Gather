@@ -2,8 +2,6 @@ from django.db import models
 from django.core import validators
 from django.utils import timezone
 from django.contrib.auth.models import User
-from django.contrib.auth.models import AbstractUser
-
 # Create your models here.
 
 
@@ -26,7 +24,6 @@ class Sale(models.Model):
 
     sale_date = models.DateField(
         verbose_name='売上日',
-        default=timezone.datetime.today(),
     )
 
     sale = models.IntegerField(

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'app',  # 追加
     'bootstrap_datepicker_plus',
     'django.contrib.humanize',
+    'account',
 ]
 
 
@@ -130,3 +131,5 @@ LOGOUT_REDIRECT_URL = '/'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # 3桁区切り
 NUMBER_GROUPING = 3
+
+AUTH_USER_MODEL = 'account.User'
