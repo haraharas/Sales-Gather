@@ -1,5 +1,6 @@
 .vscode/
 __pycache__
-migrations
-__init__.py
+account/migrations/*
+app/migrations/*
+!__init__.py
 db.sqlite3
