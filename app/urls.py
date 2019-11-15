@@ -1,6 +1,10 @@
 from django.urls import path
-from .views import SaleFilterView, SaleDetailView, SaleCreateView, SaleUpdateView, SaleDeleteView, SaleMonthView
-
+from .views import SaleFilterView, SaleDetailView, SaleCreateView, SaleUpdateView, SaleDeleteView, SaleMonthView, SaleImport
+from django.contrib import admin
+from . import views
+admin.site.site_title = '売上集計システム'
+admin.site.site_header = '売上集計システム'
+admin.site.index_title = 'メニュー'
 urlpatterns = [
     # 一覧画面
     path('', SaleFilterView.as_view(), name='index'),
@@ -14,4 +18,8 @@ urlpatterns = [
     path('delete/<int:pk>/', SaleDeleteView.as_view(), name='delete'),
     # 一覧画面
     path('month/', SaleMonthView.as_view(), name='month'),
+    # CSVインポート
+    path('import/', views.SaleImport.as_view(), name='import'),
+    # CSVエクスポート
+    path('export/', views.sale_export, name='export'),
 ]

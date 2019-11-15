@@ -20,3 +20,8 @@ class SaleForm(forms.ModelForm):
             'sale': forms.NumberInput(attrs={'min': 1}),
             'cost': forms.NumberInput(attrs={'min': 1}),
         }
+
+
+class CSVUploadForm(forms.Form):
+    file = forms.FileField(
+        label='CSVファイル', help_text='※拡張子csvのファイルをアップロードしてください。')
