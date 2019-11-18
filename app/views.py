@@ -11,9 +11,11 @@ from .forms import SaleForm
 
 import csv
 import io
-from django.http import HttpResponse
 from django.views import generic
+from django.http import HttpResponse
 from .forms import CSVUploadForm
+from datetime import datetime
+from django.shortcuts import redirect
 
 
 class SaleFilterView(LoginRequiredMixin, FilterView):
@@ -77,23 +79,14 @@ class SaleMonthView(LoginRequiredMixin, FilterView):
 # インポート処理
 
 
-class SaleImport(LoginRequiredMixin, FormView):
+class SaleImport(generic.FormView):
     template_name = 'app/import.html'
     success_url = reverse_lazy('index')
     form_class = CSVUploadForm
 
     def form_valid(self, form):
-        # csv.readerに渡すため、TextIOWrapperでテキストモードなファイルに変換
-        csvfile = io.TextIOWrapper(form.cleaned_data['file'], encoding='utf-8')
-        reader = csv.reader(csvfile)
-        # 1行ずつ取り出し、作成していく
-        for row in reader:
-            Sale.store = row[0]
-            Sale.sale_date = row[1]
-            Sale.sale = row[2]
-            Sale.cost = row[3]
-            Sale.save()
-        return super().form_valid(form)
+        form.save()
+        return redirect('../')
 
 
 def sale_export(request):
@@ -103,5 +96,5 @@ def sale_export(request):
     writer = csv.writer(response)
     for sale in Sale.objects.all():
         writer.writerow(
-            [sale.store, sale.sale_date, sale.sale, sale.cost])
+            [sale.id, sale.store, sale.sale_date, sale.sale, sale.cost])
     return response
