@@ -16,8 +16,8 @@ urlpatterns = [
     path('update/<int:pk>/', SaleUpdateView.as_view(), name='update'),
     # 削除画面
     path('delete/<int:pk>/', SaleDeleteView.as_view(), name='delete'),
-    # 一覧画面
-    path('month/', SaleMonthView.as_view(), name='month'),
+    # 月集計
+    path('month/', views.SaleMonthView, name='month'),
     # CSVインポート
     path('import/', views.SaleImport.as_view(), name='import'),
     # CSVエクスポート

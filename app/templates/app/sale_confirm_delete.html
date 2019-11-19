@@ -11,19 +11,12 @@
             <div class="col-12">
                 <div class="float-right">
                     <a class="btn btn-outline-secondary" href="{% url 'index' %}">戻る</a>
-                    <input type="submit" class="btn btn-outline-secondary" value="削除" />
+                    <input type="submit" class="btn btn-danger" value="削除" />
                 </div>
             </div>
         </div>
         {% include "./sale_card.html" %}
-        <div class="row">
-            <div class="col-12">
-                <div class="float-right">
-                    <a class="btn btn-outline-secondary" href="{% url 'index' %}">戻る</a>
-                    <input type="submit" class="btn btn-outline-secondary" value="削除" />
-                </div>
-            </div>
-        </div>
+
     </form>
 </div>
 {% endblock %}
