@@ -28,94 +28,37 @@
 
     <form class="form-inline" action="{% url 'month' %}" method="post">
         {% csrf_token %}
-        <input type="hidden" name="mode" value="__search_form__">
+        <input type="hidden" name="mode" class="calc_month">
         {{search_form|crispy}}
-        <button>Search</button>
+        <button class="btn btn-primary ">検索</button>
     </form>
-
+    {{table|safe}}
 
     <table class="month_table table table-sm table-bordered text-sm-left">
         <thead class="thead-dark">
             <tr>
                 <th scope="col">
-                    <div class="text-center">日付</div>
+                    <div class="text-center">日</div>
                 </th>
+                {% for i in header %}
                 <th scope="col">
-                    <div class="text-center">売上</div>
+                    <div class="text-center">{{ i }}</div>
                 </th>
-                <th scope="col">
-                    <div class="text-center">売上累計</div>
-                </th>
-                <th scope="col">
-                    <div class="text-center">粗利</div>
-                </th>
-                <th scope="col">
-                    <div class="text-center">粗利累計</div>
-                </th>
-                <th scope="col">
-                    <div class="text-center">前年売上</div>
-                </th>
-                <th scope="col">
-                    <div class="text-center">前年売上累計</div>
-                </th>
-                <th scope="col">
-                    <div class="text-center">前年粗利</div>
-                </th>
-                <th scope="col">
-                    <div class="text-center">前年粗利累計</div>
-                </th>
-                <th scope="col">
-                    <div class="text-center">売上累計比</div>
-                </th>
-                <th scope="col">
-                    <div class="text-center">粗利累計比</div>
-                </th>
+                {% endfor %}
             </tr>
         </thead>
-        {% for que1 in q %}
+
         <tbody>
+            {% for i in record %}
             <tr>
+                {% for j in i %}
                 <td>
-                    <div class="text-center">{{ que1.day }}</div>
+                    <div class="text-center">{{ j | intcomma }}</div>
                 </td>
-                <td>
-                    <div class="text-right">{{ que1.sale | intcomma }}</div>
-                </td>
-                <td>
-                    <div class="text-right">{{ que1.sale_sum | intcomma }}</div>
-                </td>
-                <td>
-                    <div class="text-right">{{ que1.arari | intcomma }}</div>
-                </td>
-                <td>
-                    <div class="text-right">{{ que1.arari_sum | intcomma }}</div>
-                </td>
-                <td>
-                    <div class="text-right">{{ que1.sale2 | intcomma }}</div>
-                </td>
-                <td>
-                    <div class="text-right">{{ que1.sale_sum2 | intcomma }}</div>
-                </td>
-                <td>
-                    <div class="text-right">{{ que1.arari2 | intcomma }}</div>
-                </td>
-                <td>
-                    <div class="text-right">{{ que1.arari_sum2 | intcomma }}</div>
-                </td>
-                <td>
-                    <div class="text-right">{{ que1.sale_sum3 | intcomma }}%</div>
-                </td>
-                <td>
-                    <div class="text-right">{{ que1.arari_sum3 | intcomma }}%</div>
-                </td>
+                {% endfor %}
             </tr>
+            {% endfor %}
         </tbody>
-        {% empty %}
-        <li>
-            対象のデータがありません
-        </li>
-        </tbody>
-        {% endfor %}
     </table>
 
 </div>

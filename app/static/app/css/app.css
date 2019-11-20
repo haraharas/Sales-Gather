@@ -6,3 +6,9 @@
 .table-sm td{
     padding: 0 0.2rem;
 }
+#id_Calc_Month_day{
+    display: none;
+}
+.calc_month label{
+    margin: 10px;
+}

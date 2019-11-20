@@ -7,6 +7,7 @@ from django.utils import timezone
 class Sale(models.Model):
 
     STORE_CHOICES = (
+        (0, '-----'),
         (1, '卸部門'),
         (2, '加工部門'),
         (3, '配送部'),

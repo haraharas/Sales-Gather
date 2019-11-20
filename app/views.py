@@ -1,3 +1,4 @@
+from django_pandas.io import read_frame
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, TemplateView, FormView
@@ -6,7 +7,7 @@ from django_filters.views import FilterView
 from django_filters import rest_framework as filters
 
 from .models import Sale
-from .filters import SaleFilter, SaleFilter_Month
+from .filters import SaleFilter
 from .forms import SaleForm, SearchForm
 
 import csv
@@ -14,12 +15,15 @@ import io
 from django.views import generic
 from django.http import HttpResponse
 from .forms import CSVUploadForm
-from datetime import datetime
+from datetime import datetime, date, timedelta
+from dateutil import relativedelta
 from django.shortcuts import redirect
 from django.db.models import Sum
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 import calendar
+import pandas as pd
+import numpy as np
 
 
 class SaleFilterView(LoginRequiredMixin, FilterView):
@@ -112,127 +116,85 @@ def sale_export(request):
             [sale.id, sale.store, sale.sale_date, sale.sale, sale.cost])
     return response
 # 月集計
+
+
 @login_required(login_url='/admin/login/')
 def SaleMonthView(request):
-    if 'search' in request.POST:
-        # requst.POST内にsearchが含まれているかどうか確認
-        # フォームの用意
-        que_id = int(request.POST["search"])
-        nen = int(request.POST["nen"])
-        tsuki = int(request.POST["tsuki"])
-        hi = calendar.monthrange(nen, tsuki)[1]
-        nissuu = []
-        for i in range(hi):
-            nissuu.append(str(i+1))
-        searchform = SearchForm()
-        query1 = Sale.objects.filter(store=que_id, sale_date__year=nen, sale_date__month=tsuki).values(
-            "sale_date", "store").annotate(Sum('cost'), Sum('sale')).order_by()
-        query2 = Sale.objects.filter(store=que_id, sale_date__year=nen-1, sale_date__month=tsuki).values(
-            "sale_date", "store").annotate(Sum('cost'), Sum('sale')).order_by()
-        store_name = Sale(store=que_id).get_store_display
-        gene = []
-        sum_col = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-        for m in nissuu:
-            gene_dict = {}
-            gene_dict["day"] = int(m)
-            for m2 in query1:
-                if int(m) == int(m2["sale_date"].day):
-                    gene_dict["sale"] = m2["sale__sum"]
-                    gene_dict["cost"] = m2["cost__sum"]
-            for m2 in query2:
-                if int(m) == int(m2["sale_date"].day):
-                    gene_dict["sale2"] = m2["sale__sum"]
-                    gene_dict["cost2"] = m2["cost__sum"]
+    header = []
+    record = []
+    if 'Calc_Month_year' in request.POST:
+        # 日付の受け取り
+        start_year = int(request.POST["Calc_Month_year"])
+        start_month = int(request.POST["Calc_Month_month"])
+        start_date = date(start_year, start_month, 1)
+        final_Date = date(start_year, start_month+1, 1) - timedelta(days=1)
+        start_date_pre = start_date - relativedelta.relativedelta(years=1)
+        final_Date_pre = final_Date - relativedelta.relativedelta(years=1)
+        sale_data = Sale.objects.all()
+        df = read_frame(sale_data, fieldnames=[
+                        'id', 'sale_date', 'sale', 'cost', 'created_at', 'store'])
+        # 粗利に変換
+        df['cost'] = df['sale'] - df['cost']
+        # 日付でインデックス
+        df['sale_date'] = pd.to_datetime(df['sale_date'])
+        df.set_index('sale_date', inplace=True)
+        # 要らないもの削除
+        df.drop(['created_at'], axis=1, inplace=True)
+        df.drop(['id'], axis=1, inplace=True)
+        # 店舗条件
+        if 'store_id' in request.POST:
+            store_id = int(request.POST["store_id"])
+            if store_id > 0:
+                df = df[df['store'] == store_id]
+        # 日付でグループ化
+        df = df.groupby(['sale_date']).sum()
+        # ひと月のDF作成
+        month_di = pd.date_range(start=start_date, end=final_Date, freq='D')
+        pre_month_di = pd.date_range(
+            start=start_date_pre, end=final_Date_pre, freq='D')
+        month_df = pd.DataFrame(month_di, index=month_di, columns={'sale_day'})
+        pre_month_df = pd.DataFrame(
+            pre_month_di, index=pre_month_di, columns={'sale_day'})
+        now_df = pd.concat([month_df, df], axis=1, join_axes=[month_df.index])
+        pre_df = pd.concat([pre_month_df, df], axis=1,
+                           join_axes=[pre_month_df.index])
+        now_df['sale_day'] = now_df['sale_day'].dt.day
+        pre_df['sale_day'] = pre_df['sale_day'].dt.day
+        # 前年と結合
+        now_df.set_index('sale_day', inplace=True)
+        pre_df.set_index('sale_day', inplace=True)
+        df = pd.concat([now_df, pre_df], axis=1)
+        df.columns = ['売上', '粗利', '前年売上', '前年粗利']
+        # 欠損を0に
+        df.fillna(0, inplace=True)
+        # 累積計追加
+        df = pd.concat([df, df['売上'].cumsum()], axis=1)
+        df = pd.concat([df, df['粗利'].cumsum()], axis=1)
+        df = pd.concat([df, df['前年売上'].cumsum()], axis=1)
+        df = pd.concat([df, df['前年粗利'].cumsum()], axis=1)
+        df.columns = ['売上', '粗利', '前年売上', '前年粗利',
+                      '売上累計', '粗利累計', '前年売上累計', '前年粗利累計']
+        df = df.astype(np.int64)
+        df = pd.concat([df, df['売上累計'] / df['前年売上累計']], axis=1)
+        df = pd.concat([df, df['粗利累計'] / df['前年粗利累計']], axis=1)
 
-            gene_dict["sale"] = gene_dict["sale"] if "sale" in gene_dict else 0
-            sum_col[0] = sum_col[0] + gene_dict["sale"]
-            gene_dict["sale_sum"] = sum_col[0]
+        df.columns = ['売上', '粗利', '前年売上', '前年粗利', '売上累計',
+                      '粗利累計', '前年売上累計', '前年粗利累計', '売上比', '粗利比']
+        df['売上比'] = (df['売上比'].replace([np.inf, -np.inf], np.nan))
+        df['粗利比'] = (df['粗利比'].replace([np.inf, -np.inf], np.nan))
+        df.fillna(0, inplace=True)
 
-            gene_dict["cost"] = gene_dict["cost"] if "cost" in gene_dict else 0
-            sum_col[1] = sum_col[1] + gene_dict["cost"]
-            gene_dict["cost_sum"] = sum_col[1]
+        df['売上比'] = df['売上比'].apply('{:.0%}'.format)
+        df['粗利比'] = df['粗利比'].apply('{:.0%}'.format)
+        df = df.round({'売上比': 1, '粗利比': 1})
 
-            gene_dict["arari"] = gene_dict["sale"] - gene_dict["cost"]
-            sum_col[2] = sum_col[2] + gene_dict["arari"]
-            gene_dict["arari_sum"] = sum_col[2]
-
-            gene_dict["sale2"] = gene_dict["sale2"] if "sale2" in gene_dict else 0
-            sum_col[3] = sum_col[3] + gene_dict["sale2"]
-            gene_dict["sale_sum2"] = sum_col[3]
-
-            gene_dict["cost2"] = gene_dict["cost2"] if "cost2" in gene_dict else 0
-            sum_col[4] = sum_col[4] + gene_dict["cost2"]
-            gene_dict["cost_sum2"] = sum_col[4]
-
-            gene_dict["arari2"] = gene_dict["sale2"] - gene_dict["cost2"]
-            sum_col[5] = sum_col[5] + gene_dict["arari2"]
-            gene_dict["arari_sum2"] = sum_col[5]
-
-            if gene_dict["sale"] == 0:
-                gene_dict["sale3"] = 0
-            elif gene_dict["sale2"] == 0:
-                gene_dict["sale3"] = 1
-            else:
-                gene_dict["sale3"] = gene_dict["sale"] / gene_dict["sale2"]
-            gene_dict["sale3"] = int(gene_dict["sale3"] * 100)
-
-            if gene_dict["sale_sum"] == 0:
-                gene_dict["sale_sum3"] = 0
-            elif gene_dict["sale_sum2"] == 0:
-                gene_dict["sale_sum3"] = 1
-            else:
-                gene_dict["sale_sum3"] = gene_dict["sale_sum"] / \
-                    gene_dict["sale_sum2"]
-            gene_dict["sale_sum3"] = int(gene_dict["sale_sum3"] * 100)
-
-            if gene_dict["cost"] == 0:
-                gene_dict["cost3"] = 0
-            elif gene_dict["cost2"] == 0:
-                gene_dict["cost3"] = 1
-            else:
-                gene_dict["cost3"] = gene_dict["cost"] / gene_dict["cost2"]
-            gene_dict["cost3"] = int(gene_dict["cost3"] * 100)
-
-            if gene_dict["cost_sum"] == 0:
-                gene_dict["cost_sum3"] = 0
-            elif gene_dict["cost_sum2"] == 0:
-                gene_dict["cost_sum3"] = 1
-            else:
-                gene_dict["cost_sum3"] = gene_dict["cost_sum"] / \
-                    gene_dict["cost_sum2"]
-            gene_dict["cost_sum3"] = int(gene_dict["cost_sum3"] * 100)
-
-            if gene_dict["arari"] == 0:
-                gene_dict["arari3"] = 0
-            elif gene_dict["arari2"] == 0:
-                gene_dict["arari3"] = 1
-            else:
-                gene_dict["arari3"] = gene_dict["arari"] / gene_dict["arari2"]
-            gene_dict["arari3"] = int(gene_dict["arari3"] * 100)
-
-            if gene_dict["arari_sum"] == 0:
-                gene_dict["arari_sum3"] = 0
-            elif gene_dict["arari_sum2"] == 0:
-                gene_dict["arari_sum3"] = 1
-            else:
-                gene_dict["arari_sum3"] = gene_dict["arari_sum"] / \
-                    gene_dict["arari_sum2"]
-            gene_dict["arari_sum3"] = int(gene_dict["arari_sum3"] * 100)
-
-            gene.append(gene_dict)
-    else:
-        query1 = Sale.objects.filter().values("sale_date", "store").annotate(
-            Sum('cost'), Sum('sale')).order_by()
-        query2 = Sale.objects.filter().values("sale_date", "store").annotate(
-            Sum('cost'), Sum('sale')).order_by()
-        store_name = "条件を入力してください"
-        searchform = SearchForm()
-        gene = []
-    #　共通処理
-    param1 = {
+        header = df.columns
+        record = df.reset_index().values.tolist()
+    param = {
         'login_user': request.user,
-        'search_form': searchform,
-        "q": gene,
-        "store_name": store_name,
+        'search_form': SearchForm(),
+        'header': header,
+        'record': record
     }
-    return render(request, 'app/sale_month.html', param1)
+    return render(request, 'app/sale_month.html', param)
+    # 入力がなければテンプレートを表示
