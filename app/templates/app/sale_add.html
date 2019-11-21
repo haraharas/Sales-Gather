@@ -1,0 +1,54 @@
+{% extends "./_base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+{{ form.certifications.errors }}
+{% load bootstrap4 %},{% bootstrap_css %},{% bootstrap_javascript jquery='full' %}
+{{ form.media }}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center">データ入力</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="float-right">
+                <a class="btn btn-outline-secondary" href="{% url 'index' %}">戻る</a>
+                <a class="btn btn-outline-secondary save" href="#">保存</a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <form method="post" id="myform">
+            {% csrf_token %}
+                <div id="div_id_store" class="form-group">
+                    <label for="id_sale_date" class=" requiredField">店舗名</label>
+                    <div class="">{{ form.store }}</div>
+                </div>
+                <div id="div_id_sale_date" class="form-group">
+                    <label for="id_sale_date" class=" requiredField">売上日</label>
+                    <div class="">{{ form.sale_date }}</div>
+                </div>
+                <div id="div_id_sale" class="form-group">
+                    <label for="id_sale" class=" requiredField">売上高</label>
+                    <div class="">{{ form.sale }}</div>
+                </div>
+                <div id="div_id_cost" class="form-group">
+                    <label for="id_cost" class=" requiredField">仕入額</label>
+                    <div class="">{{ form.cost }}</div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="float-right">
+                <a class="btn btn-outline-secondary" href="{% url 'index' %}">戻る</a>
+                <a class="btn btn-outline-secondary save" href="#">保存</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

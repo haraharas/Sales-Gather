@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import SaleFilterView, SaleDetailView, SaleCreateView, SaleUpdateView, SaleDeleteView, SaleMonthView, SaleImport
+from .views import SaleFilterView, SaleDetailView,  SaleUpdateView, SaleDeleteView, SaleMonthView, SaleImport
 from django.contrib import admin
 from . import views
 admin.site.site_title = '売上集計システム'
@@ -11,7 +11,7 @@ urlpatterns = [
     # 詳細画面
     path('detail/<int:pk>/', SaleDetailView.as_view(), name='detail'),
     # 登録画面
-    path('create/', SaleCreateView.as_view(), name='create'),
+    path('create/', views.SaleCreate, name='create'),
     # 更新画面
     path('update/<int:pk>/', SaleUpdateView.as_view(), name='update'),
     # 削除画面

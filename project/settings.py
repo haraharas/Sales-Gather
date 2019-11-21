@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'crispy_forms',  # 追加
     'app',  # 追加
     'bootstrap_datepicker_plus',
+    'bootstrap4',
     'django.contrib.humanize',
     'account',
 ]

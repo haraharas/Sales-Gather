@@ -1,6 +1,6 @@
 from .models import Sale
-from .filters import SaleFilter
-from .forms import SaleForm, SearchForm, id_to_store
+from .filters import SaleFilter, SaleFilter_Month
+from .forms import SaleForm, SearchForm, id_to_store, CreateSaleForm
 from .forms import CSVUploadForm
 from datetime import datetime, date, timedelta
 from dateutil import relativedelta
@@ -17,10 +17,10 @@ from django_filters.views import FilterView
 from django_filters import rest_framework as filters
 from django.views import generic
 from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import render, redirect
 from django.db.models import Sum
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+
 
 import pandas as pd
 import numpy as np
@@ -58,11 +58,26 @@ class SaleDetailView(LoginRequiredMixin, DetailView):
 # 登録画面
 
 
-class SaleCreateView(LoginRequiredMixin, CreateView):
-    model = Sale
-    form_class = SaleForm
-    success_url = reverse_lazy('index')
+def SaleCreate(request):
+    form = CreateSaleForm(request.POST or None)
+    if form.is_valid():
+        print(form.cleaned_data['store'])
+        Sale.objects.filter(
+            store=form.cleaned_data['store'], sale_date=form.cleaned_data['sale_date']).delete()
+        db = Sale()
+        db.store = form.cleaned_data['store']
+        db.sale_date = form.cleaned_data['sale_date']
+        db.sale = form.cleaned_data['sale']
+        db.cost = form.cleaned_data['cost']
 
+        Sale.objects.create(
+            store=db.store,
+            sale_date=db.sale_date,
+            sale=db.sale,
+            cost=db.cost,
+        )
+        return redirect('index')
+    return render(request, 'app/sale_add.html', {'form': form})
 
 # 更新画面
 

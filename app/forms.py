@@ -79,3 +79,32 @@ class SearchForm(forms.Form):
         this_day = date.today()
         self.fields['Calc_Month'].initial = date(
             this_day.year, this_day.month, 1)
+
+
+class CreateSaleForm(forms.Form):
+    fields = ('store', 'sale_date', 'sale', 'cost')
+    store = forms.ChoiceField(
+        label='店舗名',
+        widget=forms.Select,
+        choices=Sale.STORE_CHOICES,
+        required=True,
+    )
+    sale_date = forms.DateField(
+        label='売上日',
+        required=True,
+        widget=datetimepicker.DatePickerInput(
+            format='%Y-%m-%d',
+            options={
+                'locale': 'ja',
+                'dayViewHeaderFormat': 'YYYY年 MMMM',
+            }
+        ),
+    )
+    sale = forms.IntegerField(
+        label='売上高',
+        required=True,
+    )
+    cost = forms.IntegerField(
+        label='仕入額',
+        required=True,
+    )
