@@ -43,6 +43,23 @@ class CSVUploadForm(forms.Form):
 STORE_CHOICES = Sale.STORE_CHOICES
 
 
+def id_to_store(store_id):
+    if store_id == 1:
+        return '卸部門'
+    elif store_id == 2:
+        return '加工部門'
+    elif store_id == 3:
+        return '配送部'
+    elif store_id == 4:
+        return '観光通り店'
+    elif store_id == 5:
+        return 'カロム店'
+    elif store_id == 6:
+        return '思案橋店'
+    elif store_id == 7:
+        return 'ブライダル'
+
+
 class SearchForm(forms.Form):
     store_id = forms.ChoiceField(
         label="　店舗　",
@@ -53,7 +70,8 @@ class SearchForm(forms.Form):
 
     Calc_Month = forms.DateField(
         label="　計算月　",
-        widget=forms.SelectDateWidget,
+        widget=forms.SelectDateWidget(),
+        required=False,
     )
 
     def __init__(self, * args, **kwargs):

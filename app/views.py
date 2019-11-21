@@ -1,3 +1,13 @@
+from .models import Sale
+from .filters import SaleFilter
+from .forms import SaleForm, SearchForm, id_to_store
+from .forms import CSVUploadForm
+from datetime import datetime, date, timedelta
+from dateutil import relativedelta
+import csv
+import io
+import calendar
+
 from django_pandas.io import read_frame
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
@@ -5,23 +15,13 @@ from django.views.generic import ListView, DetailView, TemplateView, FormView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django_filters.views import FilterView
 from django_filters import rest_framework as filters
-
-from .models import Sale
-from .filters import SaleFilter
-from .forms import SaleForm, SearchForm
-
-import csv
-import io
 from django.views import generic
 from django.http import HttpResponse
-from .forms import CSVUploadForm
-from datetime import datetime, date, timedelta
-from dateutil import relativedelta
 from django.shortcuts import redirect
 from django.db.models import Sum
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-import calendar
+
 import pandas as pd
 import numpy as np
 
@@ -120,8 +120,6 @@ def sale_export(request):
 
 @login_required(login_url='/admin/login/')
 def SaleMonthView(request):
-    header = []
-    record = []
     if 'Calc_Month_year' in request.POST:
         # 日付の受け取り
         start_year = int(request.POST["Calc_Month_year"])
@@ -145,7 +143,8 @@ def SaleMonthView(request):
         if 'store_id' in request.POST:
             store_id = int(request.POST["store_id"])
             if store_id > 0:
-                df = df[df['store'] == store_id]
+                store = id_to_store(store_id)
+                df = df[df['store'] == store]
         # 日付でグループ化
         df = df.groupby(['sale_date']).sum()
         # ひと月のDF作成
@@ -183,18 +182,44 @@ def SaleMonthView(request):
         df['売上比'] = (df['売上比'].replace([np.inf, -np.inf], np.nan))
         df['粗利比'] = (df['粗利比'].replace([np.inf, -np.inf], np.nan))
         df.fillna(0, inplace=True)
-
+        # 比率追加
         df['売上比'] = df['売上比'].apply('{:.0%}'.format)
         df['粗利比'] = df['粗利比'].apply('{:.0%}'.format)
         df = df.round({'売上比': 1, '粗利比': 1})
+        # 合計計算
+        df = df[['売上', '売上累計', '粗利', '粗利累計',  '前年売上', '前年売上累計',  '前年粗利',
+                       '前年粗利累計', '売上比', '粗利比']]
+        footer = df.sum()
+        footer['売上累計'] = df.iloc[-1]['売上累計']
+        footer['粗利累計'] = df.iloc[-1]['粗利累計']
+        footer['前年売上累計'] = df.iloc[-1]['前年売上累計']
+        footer['前年粗利累計'] = df.iloc[-1]['前年粗利累計']
+        footer['売上比'] = df.iloc[-1]['売上比']
+        footer['粗利比'] = df.iloc[-1]['粗利比']
 
+        # テンプレート用に変形
+        footer = footer.tolist()
         header = df.columns
+        print(header)
         record = df.reset_index().values.tolist()
-    param = {
-        'login_user': request.user,
-        'search_form': SearchForm(),
-        'header': header,
-        'record': record
-    }
-    return render(request, 'app/sale_month.html', param)
+        initial_dict = {
+            'Calc_Month_year': start_year,
+            'Calc_Month_month': start_month,
+            'store_id': store_id
+        }
+        param = {
+            'login_user': request.user,
+            'search_form': SearchForm(request.POST, initial=initial_dict),
+            'header': header,
+            'record': record,
+            'footer': footer
+        }
+        return render(request, 'app/sale_month.html', param)
+
     # 入力がなければテンプレートを表示
+    else:
+        param = {
+            'login_user': request.user,
+            'search_form': SearchForm(),
+        }
+    return render(request, 'app/sale_month.html', param)
