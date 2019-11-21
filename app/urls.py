@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import SaleFilterView, SaleDetailView, SaleCreateView, SaleUpdateView, SaleDeleteView, SaleMonthView
+from .views import SaleFilterView, SaleDetailView, SaleUpdateView, SaleDeleteView, SaleMonthView
+from . import views
 
 urlpatterns = [
     # 一覧画面
@@ -7,7 +8,7 @@ urlpatterns = [
     # 詳細画面
     path('detail/<int:pk>/', SaleDetailView.as_view(), name='detail'),
     # 登録画面
-    path('create/', SaleCreateView.as_view(), name='create'),
+    path('create/', views.SaleCreate, name='create'),
     # 更新画面
     path('update/<int:pk>/', SaleUpdateView.as_view(), name='update'),
     # 削除画面

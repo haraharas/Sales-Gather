@@ -4,10 +4,11 @@ from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django_filters.views import FilterView
 from django_filters import rest_framework as filters
+from django.shortcuts import render, redirect
 
 from .models import Sale
 from .filters import SaleFilter, SaleFilter_Month
-from .forms import SaleForm
+from .forms import SaleForm, CreateSaleForm
 
 
 class SaleFilterView(LoginRequiredMixin, FilterView):
@@ -40,14 +41,26 @@ class SaleDetailView(LoginRequiredMixin, DetailView):
     success_url = reverse_lazy('index')
 
 # 登録画面
+def SaleCreate(request):
+    form = CreateSaleForm(request.POST or None)
+    if form.is_valid():
+        print(form.cleaned_data['store'])
+        Sale.objects.filter(
+            store=form.cleaned_data['store'], sale_date=form.cleaned_data['sale_date']).delete()
+        db = Sale()
+        db.store = form.cleaned_data['store']
+        db.sale_date = form.cleaned_data['sale_date']
+        db.sale = form.cleaned_data['sale']
+        db.cost = form.cleaned_data['cost']
 
-
-class SaleCreateView(LoginRequiredMixin, CreateView):
-    model = Sale
-    form_class = SaleForm
-    success_url = reverse_lazy('index')
-    store = 1
-
+        Sale.objects.create(
+            store=db.store,
+            sale_date=db.sale_date,
+            sale=db.sale,
+            cost=db.cost,
+        )
+        return redirect('index')
+    return render(request, 'app/sale_add.html', {'form': form})
 
 # 更新画面
 class SaleUpdateView(LoginRequiredMixin, UpdateView):

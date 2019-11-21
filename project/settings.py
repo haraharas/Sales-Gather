@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'r8c(c*+!&s=(aee6$b5&ve^zi5-_gn^4dbduw#c(+d1ttq9#k8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'crispy_forms',  # 追加
     'app',  # 追加
     'bootstrap_datepicker_plus',
+    'bootstrap4',
     'django.contrib.humanize',
     'account',
 ]
