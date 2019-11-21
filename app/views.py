@@ -1,5 +1,5 @@
 from .models import Sale
-from .filters import SaleFilter, SaleFilter_Month
+from .filters import SaleFilter
 from .forms import SaleForm, SearchForm, id_to_store, CreateSaleForm
 from .forms import CSVUploadForm
 from datetime import datetime, date, timedelta
