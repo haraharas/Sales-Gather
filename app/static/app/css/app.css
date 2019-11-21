@@ -12,3 +12,6 @@
 .calc_month label{
     margin: 10px;
 }
+.sale_year #id_Calc_Month_month{
+    display: none !important;
+}

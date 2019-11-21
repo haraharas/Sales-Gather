@@ -60,7 +60,7 @@ def id_to_store(store_id):
         return 'ブライダル'
 
 
-class SearchForm(forms.Form):
+class MonthForm(forms.Form):
     store_id = forms.ChoiceField(
         label="　店舗　",
         widget=forms.Select,
@@ -70,12 +70,35 @@ class SearchForm(forms.Form):
 
     Calc_Month = forms.DateField(
         label="　計算月　",
-        widget=forms.SelectDateWidget(),
+        widget=forms.SelectDateWidget(
+            years=[x for x in range(2018, date.today().year+2)]),
         required=False,
     )
 
     def __init__(self, * args, **kwargs):
-        super(SearchForm, self).__init__(*args, **kwargs)
+        super(MonthForm, self).__init__(*args, **kwargs)
+        this_day = date.today()
+        self.fields['Calc_Month'].initial = date(
+            this_day.year, this_day.month, 1)
+
+
+class YearForm(forms.Form):
+    store_id = forms.ChoiceField(
+        label="　店舗　",
+        widget=forms.Select,
+        choices=STORE_CHOICES,
+        required=False,
+    )
+
+    Calc_Month = forms.DateField(
+        label="　計算月　",
+        widget=forms.SelectDateWidget(
+            years=[x for x in range(2018, date.today().year+2)]),
+        required=False,
+    )
+
+    def __init__(self, * args, **kwargs):
+        super(YearForm, self).__init__(*args, **kwargs)
         this_day = date.today()
         self.fields['Calc_Month'].initial = date(
             this_day.year, this_day.month, 1)

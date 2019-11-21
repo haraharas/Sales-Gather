@@ -26,7 +26,7 @@
         </div>
     </div>
 
-    <form class="form-inline" action="{% url 'month' %}" method="post">
+    <form class="form-inline sale_year" action="{% url 'year' %}" method="post">
         {% csrf_token %}
         <input type="hidden" name="mode" class="calc_month">
         {{search_form|crispy}}
@@ -35,8 +35,9 @@
     <table class="month_table table table-sm table-bordered text-sm-left table-striped">
         <thead class="thead-dark">
             <tr>
-                <th scope="col">
-                    <div class="text-center">日</div>
+
+                <th scope="col" colspan="2">
+                    <div class="text-center">月</div>
                 </th>
                 {% for i in header %}
                 <th scope="col">
@@ -51,7 +52,11 @@
             <tr>
                 {% for j in i %}
                 <td>
-                    <div class="text-center">{{ j | intcomma }}</div>
+                    {% if forloop.first %}
+                    <div class="text-center">{{ j }}</div>
+                    {% else %}
+                    <div class="text-center">{{ j | intcomma}}</div>
+                    {% endif %}
                 </td>
                 {% endfor %}
             </tr>
@@ -59,7 +64,8 @@
         </tbody>
         <tfoot>
             <tr>
-                <th scope="col">
+
+                <th scope="col" colspan="2">
                     <div class="text-center">合計</div>
                 </th>
                 {% for i in footer %}

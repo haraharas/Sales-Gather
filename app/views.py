@@ -1,6 +1,6 @@
 from .models import Sale
 from .filters import SaleFilter
-from .forms import SaleForm, SearchForm, id_to_store, CreateSaleForm
+from .forms import SaleForm, MonthForm, YearForm, id_to_store, CreateSaleForm
 from .forms import CSVUploadForm
 from datetime import datetime, date, timedelta
 from dateutil import relativedelta
@@ -133,6 +133,44 @@ def sale_export(request):
 # 月集計
 
 
+def sale_df(df):
+    df.columns = ['売上', '粗利', '前年売上', '前年粗利']
+    # 欠損を0に
+    df.fillna(0, inplace=True)
+    # 累積計追加
+    df = pd.concat([df, df['売上'].cumsum()], axis=1)
+    df = pd.concat([df, df['粗利'].cumsum()], axis=1)
+    df = pd.concat([df, df['前年売上'].cumsum()], axis=1)
+    df = pd.concat([df, df['前年粗利'].cumsum()], axis=1)
+    df.columns = ['売上', '粗利', '前年売上', '前年粗利',
+                  '売上累計', '粗利累計', '前年売上累計', '前年粗利累計']
+    df = df.astype(np.int64)
+    df = pd.concat([df, df['売上累計'] / df['前年売上累計']], axis=1)
+    df = pd.concat([df, df['粗利累計'] / df['前年粗利累計']], axis=1)
+
+    df.columns = ['売上', '粗利', '前年売上', '前年粗利', '売上累計',
+                  '粗利累計', '前年売上累計', '前年粗利累計', '売上比', '粗利比']
+    df['売上比'] = (df['売上比'].replace([np.inf, -np.inf], np.nan))
+    df['粗利比'] = (df['粗利比'].replace([np.inf, -np.inf], np.nan))
+    df.fillna(0, inplace=True)
+    # 比率追加
+    df['売上比'] = df['売上比'].apply('{:.0%}'.format)
+    df['粗利比'] = df['粗利比'].apply('{:.0%}'.format)
+    df = df.round({'売上比': 1, '粗利比': 1})
+    # 合計計算
+    df = df[['売上', '売上累計', '粗利', '粗利累計',  '前年売上', '前年売上累計',  '前年粗利',
+                   '前年粗利累計', '売上比', '粗利比']]
+    footer = df.sum()
+    footer['売上累計'] = df.iloc[-1]['売上累計']
+    footer['粗利累計'] = df.iloc[-1]['粗利累計']
+    footer['前年売上累計'] = df.iloc[-1]['前年売上累計']
+    footer['前年粗利累計'] = df.iloc[-1]['前年粗利累計']
+    footer['売上比'] = df.iloc[-1]['売上比']
+    footer['粗利比'] = df.iloc[-1]['粗利比']
+
+    return df, footer
+
+
 @login_required(login_url='/admin/login/')
 def SaleMonthView(request):
     if 'Calc_Month_year' in request.POST:
@@ -178,44 +216,12 @@ def SaleMonthView(request):
         now_df.set_index('sale_day', inplace=True)
         pre_df.set_index('sale_day', inplace=True)
         df = pd.concat([now_df, pre_df], axis=1)
-        df.columns = ['売上', '粗利', '前年売上', '前年粗利']
-        # 欠損を0に
-        df.fillna(0, inplace=True)
-        # 累積計追加
-        df = pd.concat([df, df['売上'].cumsum()], axis=1)
-        df = pd.concat([df, df['粗利'].cumsum()], axis=1)
-        df = pd.concat([df, df['前年売上'].cumsum()], axis=1)
-        df = pd.concat([df, df['前年粗利'].cumsum()], axis=1)
-        df.columns = ['売上', '粗利', '前年売上', '前年粗利',
-                      '売上累計', '粗利累計', '前年売上累計', '前年粗利累計']
-        df = df.astype(np.int64)
-        df = pd.concat([df, df['売上累計'] / df['前年売上累計']], axis=1)
-        df = pd.concat([df, df['粗利累計'] / df['前年粗利累計']], axis=1)
 
-        df.columns = ['売上', '粗利', '前年売上', '前年粗利', '売上累計',
-                      '粗利累計', '前年売上累計', '前年粗利累計', '売上比', '粗利比']
-        df['売上比'] = (df['売上比'].replace([np.inf, -np.inf], np.nan))
-        df['粗利比'] = (df['粗利比'].replace([np.inf, -np.inf], np.nan))
-        df.fillna(0, inplace=True)
-        # 比率追加
-        df['売上比'] = df['売上比'].apply('{:.0%}'.format)
-        df['粗利比'] = df['粗利比'].apply('{:.0%}'.format)
-        df = df.round({'売上比': 1, '粗利比': 1})
-        # 合計計算
-        df = df[['売上', '売上累計', '粗利', '粗利累計',  '前年売上', '前年売上累計',  '前年粗利',
-                       '前年粗利累計', '売上比', '粗利比']]
-        footer = df.sum()
-        footer['売上累計'] = df.iloc[-1]['売上累計']
-        footer['粗利累計'] = df.iloc[-1]['粗利累計']
-        footer['前年売上累計'] = df.iloc[-1]['前年売上累計']
-        footer['前年粗利累計'] = df.iloc[-1]['前年粗利累計']
-        footer['売上比'] = df.iloc[-1]['売上比']
-        footer['粗利比'] = df.iloc[-1]['粗利比']
+        df, footer = sale_df(df)
 
         # テンプレート用に変形
         footer = footer.tolist()
         header = df.columns
-        print(header)
         record = df.reset_index().values.tolist()
         initial_dict = {
             'Calc_Month_year': start_year,
@@ -224,7 +230,7 @@ def SaleMonthView(request):
         }
         param = {
             'login_user': request.user,
-            'search_form': SearchForm(request.POST, initial=initial_dict),
+            'search_form': MonthForm(request.POST, initial=initial_dict),
             'header': header,
             'record': record,
             'footer': footer
@@ -235,6 +241,97 @@ def SaleMonthView(request):
     else:
         param = {
             'login_user': request.user,
-            'search_form': SearchForm(),
+            'search_form': MonthForm(),
         }
     return render(request, 'app/sale_month.html', param)
+
+
+@login_required(login_url='/admin/login/')
+def SaleYearView(request):
+    if 'Calc_Month_year' in request.POST:
+        # 日付の受け取り
+        start_year = int(request.POST["Calc_Month_year"])
+        start_date = date(start_year, 5, 1)
+        final_Date = date(start_date.year+1,
+                          start_date.month, 1) - timedelta(days=1)
+        start_date_pre = start_date - relativedelta.relativedelta(years=1)
+        final_Date_pre = final_Date - relativedelta.relativedelta(years=1)
+
+        sale_data = Sale.objects.all()
+        df = read_frame(sale_data, fieldnames=[
+                        'id', 'sale_date', 'sale', 'cost', 'created_at', 'store'])
+        # 粗利に変換
+        df['cost'] = df['sale'] - df['cost']
+        # 日付でインデックス
+        df['sale_date'] = pd.to_datetime(df['sale_date'])
+        df.set_index('sale_date', inplace=True)
+        # 要らないもの削除
+        df.drop(['created_at'], axis=1, inplace=True)
+        df.drop(['id'], axis=1, inplace=True)
+        # 店舗条件
+        if 'store_id' in request.POST:
+            store_id = int(request.POST["store_id"])
+            if store_id > 0:
+                store = id_to_store(store_id)
+                df = df[df['store'] == store]
+        # 日付でグループ化
+        df = df.groupby(['sale_date']).sum()
+
+        # 1年のDF作成
+        month_di = pd.date_range(start=start_date, end=final_Date, freq='D')
+
+        pre_month_di = pd.date_range(
+            start=start_date_pre, end=final_Date_pre, freq='D')
+        month_df = pd.DataFrame(month_di, index=month_di, columns={'sale_day'})
+        pre_month_df = pd.DataFrame(
+            pre_month_di, index=pre_month_di, columns={'sale_day'})
+        now_df = pd.concat([month_df, df], axis=1, join_axes=[month_df.index])
+        pre_df = pd.concat([pre_month_df, df], axis=1,
+                           join_axes=[pre_month_df.index])
+        # 行並び替え
+        now_df['sale_year'] = now_df['sale_day'].dt.year
+        print(now_df['sale_year'].astype(str))
+        now_df['sale_day'] = now_df['sale_day'].dt.month
+        pre_df['sale_day'] = pre_df['sale_day'].dt.month
+
+        # 前年と結合
+        now_df.set_index('sale_day', inplace=True)
+        pre_df.set_index('sale_day', inplace=True)
+
+        # 行並び替え
+        now_df = now_df.groupby(['sale_day', 'sale_year']).sum()
+        pre_df = pre_df.groupby(['sale_day']).sum()
+
+        # 行並び替え
+        now_df.reset_index('sale_year', inplace=True)
+        df = pd.concat([now_df, pre_df], axis=1)
+        df.set_index('sale_year', append=True, inplace=True)
+        df.index = df.index.swaplevel('sale_year', 'sale_day')
+        df.sort_index(inplace=True)
+
+        df, footer = sale_df(df)
+
+        # テンプレート用に変形
+        footer = footer.tolist()
+        header = df.columns
+        record = df.reset_index().values.tolist()
+        initial_dict = {
+            'Calc_Month_year': start_year,
+            'store_id': store_id
+        }
+        param = {
+            'login_user': request.user,
+            'search_form': YearForm(request.POST, initial=initial_dict),
+            'header': header,
+            'record': record,
+            'footer': footer
+        }
+        return render(request, 'app/sale_year.html', param)
+
+    # 入力がなければテンプレートを表示
+    else:
+        param = {
+            'login_user': request.user,
+            'search_form': YearForm(),
+        }
+    return render(request, 'app/sale_year.html', param)
