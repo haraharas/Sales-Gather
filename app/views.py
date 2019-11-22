@@ -36,7 +36,7 @@ class SaleFilterView(LoginRequiredMixin, FilterView):
     strict = False
 
     # 1ページあたりの表示件数
-    paginate_by = 10
+    paginate_by = 20
 
     # 検索条件をセッションに保存する or 呼び出す
     def get(self, request, **kwargs):
@@ -109,16 +109,19 @@ class SaleImport(generic.FormView):
         # 1行ずつ取り出し、作成していく
         for row in reader:
             sale, created = Sale.objects.get_or_create(
-                store=row[1], sale_date=row[2], defaults=dict(
-                    store=1, sale=0, cost=0, created_at=dt_time)
+                store=row[0], sale_date=row[1], defaults=dict(
+                    store=row[0], sale=row[2], cost=row[3], created_at=dt_time)
             )
-            sale.store = row[1]
-            sale.sale_date = row[2]
-            sale.sale = row[3]
-            sale.cost = row[4]
+            sale.store = row[0]
+            sale.sale_date = row[1]
+            if int(row[2]) != 0:
+                sale.sale = row[2]
+            if int(row[3]) != 0:
+                sale.cost = row[3]
             sale.created_at = dt_time
             sale.save()
         return super().form_valid(form)
+
 
 
 def sale_export(request):
@@ -158,8 +161,7 @@ def sale_df(df):
     df['粗利比'] = df['粗利比'].apply('{:.0%}'.format)
     df = df.round({'売上比': 1, '粗利比': 1})
     # 合計計算
-    df = df[['売上', '売上累計', '粗利', '粗利累計',  '前年売上', '前年売上累計',  '前年粗利',
-                   '前年粗利累計', '売上比', '粗利比']]
+    df = df[['売上', '売上累計', '粗利', '粗利累計',  '前年売上', '前年売上累計',  '前年粗利','前年粗利累計', '売上比', '粗利比']]
     footer = df.sum()
     footer['売上累計'] = df.iloc[-1]['売上累計']
     footer['粗利累計'] = df.iloc[-1]['粗利累計']
