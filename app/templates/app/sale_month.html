@@ -51,7 +51,7 @@
             <tr>
                 {% for j in i %}
                 <td>
-                    <div class="text-center">{{ j | intcomma }}</div>
+                    <div class="text-right">{{ j | intcomma }}</div>
                 </td>
                 {% endfor %}
             </tr>
@@ -60,11 +60,11 @@
         <tfoot>
             <tr>
                 <th scope="col">
-                    <div class="text-center">合計</div>
+                    <div class="text-right">合計</div>
                 </th>
                 {% for i in footer %}
                 <th scope="col">
-                    <div class="text-center">{{ i|intcomma }}</div>
+                    <div class="text-right">{{ i|intcomma }}</div>
                 </th>
                 {% endfor %}
             </tr>
