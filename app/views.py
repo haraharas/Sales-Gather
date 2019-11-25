@@ -61,21 +61,13 @@ class SaleDetailView(LoginRequiredMixin, DetailView):
 def SaleCreate(request):
     form = CreateSaleForm(request.POST or None)
     if form.is_valid():
-        print(form.cleaned_data['store'])
-        Sale.objects.filter(
-            store=form.cleaned_data['store'], sale_date=form.cleaned_data['sale_date']).delete()
-        db = Sale()
-        db.store = form.cleaned_data['store']
-        db.sale_date = form.cleaned_data['sale_date']
-        db.sale = form.cleaned_data['sale']
-        db.cost = form.cleaned_data['cost']
-
-        Sale.objects.create(
-            store=db.store,
-            sale_date=db.sale_date,
-            sale=db.sale,
-            cost=db.cost,
-        )
+        dt_time = datetime.now()
+        sale, created = Sale.objects.get_or_create(store=form.cleaned_data['store'], sale_date=form.cleaned_data['sale_date'], defaults=dict(
+            sale=0, cost=0, created_at=dt_time))
+        sale.created_at = dt_time
+        sale.sale = form.cleaned_data['sale']
+        sale.cost = form.cleaned_data['cost']
+        sale.save()
         return redirect('index')
     return render(request, 'app/sale_add.html', {'form': form})
 
