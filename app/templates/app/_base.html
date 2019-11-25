@@ -16,8 +16,8 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">売上集計システム</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-dark text-white">
+        <a class="navbar-brand text-white" href="#">売上集計システム</a>
         <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#Navber" aria-controls="Navber" aria-expanded="false" aria-label="ナビゲーションの切替">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -25,27 +25,23 @@
         <div class="collapse navbar-collapse" id="Navber">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="../">一覧表示</a>
+                    <a class="nav-link text-white" href="../">一覧表示</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/month">月集計</a>
+                    <a class="nav-link text-white" href="/month">月集計</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/year">年集計</a>
+                    <a class="nav-link text-white" href="/year">年集計</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/import">データインポート</a>
+                    <a class="nav-link text-white" href="/import">データインポート</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admin:logout'%}">ログアウト</a>
+                    <a class="nav-link text-white" href="{% url 'admin:logout'%}">ログアウト</a>
                 </li>
             </ul>
         </div>
-        {% if user.is_authenticated %}
-        <p>{{ user.get_username }}でログイン中</p>
-        {% else %}
-        <p>ログインしていません</p>
-        {% endif %}
+
         <!-- /.navbar-collapse -->
     </nav>
     {% block content %}
