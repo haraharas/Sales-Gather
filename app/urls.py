@@ -28,6 +28,3 @@ urlpatterns = [
     path('export/', views.sale_export, name='export'),
 
 ]
-# SSL
-urlpatterns += static.static(settings.CERT_URL,
-                             document_root=settings.CERT_ROOT)
