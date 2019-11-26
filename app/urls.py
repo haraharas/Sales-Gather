@@ -2,6 +2,8 @@ from django.urls import path
 from .views import SaleFilterView, SaleDetailView,  SaleUpdateView, SaleDeleteView, SaleMonthView, SaleImport, SaleYearView
 from django.contrib import admin
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 admin.site.site_title = '売上集計システム'
 admin.site.site_header = '売上集計システム'
 admin.site.index_title = 'メニュー'
@@ -24,4 +26,8 @@ urlpatterns = [
     path('import/', views.SaleImport.as_view(), name='import'),
     # CSVエクスポート
     path('export/', views.sale_export, name='export'),
+
 ]
+# SSL
+urlpatterns += static.static(settings.CERT_URL,
+                             document_root=settings.CERT_ROOT)
