@@ -36,7 +36,7 @@ class SaleForm(LoginRequiredMixin, forms.ModelForm):
 
 class CSVUploadForm(forms.Form):
     file = forms.FileField(
-        label='CSVファイル', help_text='※拡張子csvのファイルをアップロードしてください。')
+        label='', help_text='※拡張子csvのファイルをアップロードしてください。')
 
 
 # 検索フォーム
