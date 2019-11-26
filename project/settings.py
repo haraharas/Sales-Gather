@@ -140,6 +140,5 @@ STATICFILES_DIRS = (
 )
 
 AUTH_USER_MODEL = 'account.User'
-# SSL設定
 CERT_ROOT = os.path.join(BASE_DIR, '.well-known')
 CERT_URL = '/.well-known/'
