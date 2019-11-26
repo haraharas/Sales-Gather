@@ -4,7 +4,7 @@
 <div class="container">
     <form action="" method="POST" enctype="multipart/form-data">
         <div class="form-group">
-            {{ form|crispy}}
+            {{ form }}
         </div>
         {% csrf_token %}
         <button class="btn" type="submit">実行</button>
