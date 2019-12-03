@@ -1,44 +1,98 @@
 html {
-  position: relative;
-  min-height: 100%;
-}
-body {
-  /* Margin bottom by footer height */
-  margin-bottom: 60px;
-}
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  /* Set the fixed height of the footer here */
-  height: 70px;
+    position: relative;
+    min-height: 100%;
 }
 
-form{
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 70px;
+}
+
+form {
     margin: 10px;
 }
 
-.container{
+.container {
     padding-top: 10px;
 }
+
 .container .text-muted {
     margin: 20px 0;
     text-align: right;
 }
-.mini{
+
+.mini {
     padding: 0 10px;
     margin: 0;
 }
 
-.table-sm td{
+.table-sm td {
     padding: 0 0.2rem;
 }
-#id_Calc_Month_day{
+
+#id_Calc_Month_day {
     display: none;
 }
-.calc_month label{
+
+.calc_month label {
     margin: 10px;
 }
-.sale_year #id_Calc_Month_month{
+
+.sale_year #id_Calc_Month_month {
     display: none !important;
+}
+
+@media screen and (max-width: 640px) {
+    .filter {
+        width: 100%;
+    }
+
+    .filter thead {
+        display: none;
+    }
+
+    .filter tr,
+    .filter td {
+        display: block;
+        width: 100%;
+        position: relative;
+    }
+
+    .filter td:first-child:before {
+        box-sizing: border-box;
+        font-weight: bold;
+        height: 40px;
+        padding: 10px;
+        position: absolute;
+        top: -41px;
+        left: -0.2%;
+        display: block;
+        width: 100.5%;
+    }
+
+    .filter td:before {
+        content: attr(data-label);
+        float: left;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+
+    .filter tr {
+        margin-bottom: 5px;
+    }
+}
+
+.month_table {
+    display: block;
+    overflow-x: scroll;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
 }
