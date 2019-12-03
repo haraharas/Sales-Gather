@@ -40,7 +40,7 @@
         </div>
     </div>
     <div class="table-responsive">
-        <table class="table table-sm table-hover">
+        <table class="table table-sm table-hover filter">
             <thead class="thead-dark">
                 <tr>
                     <th></th>
@@ -60,12 +60,12 @@
                             <a class="btn btn-info btn-sm mini" href="{% url 'update' sale.pk %}">編集</a>
                         </div>
                     </td>
-                    <td>{{ sale.get_store_display }}</td>
-                    <td>{{ sale.sale_date|date:"Y/m/d" }}</td>
-                    <td>{{ sale.sale|intcomma }}円</td>
-                    <td>{{ sale.cost|intcomma }}円</td>
-                    <td class="visible-lg">{{ sale.created_at}}</td>
-                    <td>
+                    <td data-label="部署名：">{{ sale.get_store_display }}</td>
+                    <td data-label="売上日：">{{ sale.sale_date|date:"Y/m/d" }}</td>
+                    <td data-label="売上高：">{{ sale.sale|intcomma }}円</td>
+                    <td data-label="仕入額：">{{ sale.cost|intcomma }}円</td>
+                    <td data-label="更新日：" class="visible-lg">{{ sale.created_at}}</td>
+                    <td class="text-right">
                         <div>
                             <a class="btn btn-sm btn-danger mini" href="{% url 'delete' sale.pk %}">削除</a>
                         </div>

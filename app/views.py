@@ -165,12 +165,13 @@ def SaleMonthView(request):
         start_year = int(request.POST["Calc_Month_year"])
         start_month = int(request.POST["Calc_Month_month"])
         start_date = date(start_year, start_month, 1)
-        final_Date = date(start_year, start_month+1, 1) - timedelta(days=1)
+        _, lastday = calendar.monthrange(start_year, start_month)
+        final_Date = date(start_year, start_month, lastday)
         start_date_pre = start_date - relativedelta.relativedelta(years=1)
         final_Date_pre = final_Date - relativedelta.relativedelta(years=1)
         sale_data = Sale.objects.all()
         df = read_frame(sale_data, fieldnames=[
-                        'id', 'sale_date', 'sale', 'cost', 'created_at', 'store'])
+            'id', 'sale_date', 'sale', 'cost', 'created_at', 'store'])
         # 粗利に変換
         df['cost'] = df['sale'] - df['cost']
         # 日付でインデックス
@@ -246,7 +247,7 @@ def SaleYearView(request):
 
         sale_data = Sale.objects.all()
         df = read_frame(sale_data, fieldnames=[
-                        'id', 'sale_date', 'sale', 'cost', 'created_at', 'store'])
+            'id', 'sale_date', 'sale', 'cost', 'created_at', 'store'])
         # 粗利に変換
         df['cost'] = df['sale'] - df['cost']
         # 日付でインデックス

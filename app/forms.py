@@ -95,14 +95,14 @@ class YearForm(forms.Form):
         label="　店舗　",
         widget=forms.Select,
         choices=STORE_CHOICES,
-        required=False,
+        required=True,
     )
 
     Calc_Month = forms.DateField(
         label="　計算月　",
         widget=forms.SelectDateWidget(
             years=[x for x in range(2018, date.today().year+2)]),
-        required=False,
+        required=True,
     )
 
     def __init__(self, * args, **kwargs):
