@@ -7,7 +7,6 @@ from django.utils import timezone
 class Sale(models.Model):
 
     STORE_CHOICES = (
-        (0, '-----'),
         (1, '卸部門'),
         (2, '加工部門'),
         (3, '配送部'),
@@ -41,6 +40,10 @@ class Sale(models.Model):
     created_at = models.DateTimeField(
         verbose_name='更新日',
         auto_now_add=True
+    )
+
+    csv_import = models.BooleanField(
+        null=True,
     )
 
     class Meta:

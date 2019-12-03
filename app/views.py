@@ -1,6 +1,6 @@
 from .models import Sale
 from .filters import SaleFilter
-from .forms import SaleForm, MonthForm, YearForm, id_to_store, CreateSaleForm
+from .forms import SaleForm, MonthForm, YearForm, id_to_store
 from .forms import CSVUploadForm
 from datetime import datetime, date, timedelta
 from dateutil import relativedelta
@@ -30,7 +30,7 @@ class SaleFilterView(LoginRequiredMixin, FilterView):
     model = Sale
     filterset_class = SaleFilter
     # デフォルトの並び順を新しい順とする
-    queryset = Sale.objects.all().order_by('-created_at')
+    queryset = Sale.objects.all().order_by('-created_at', '-sale_date')
 
     # クエリ未指定の時に全件検索を行うために以下のオプションを指定（django-filter2.0以降）
     strict = False
@@ -58,18 +58,10 @@ class SaleDetailView(LoginRequiredMixin, DetailView):
 # 登録画面
 
 
-def SaleCreate(request):
-    form = CreateSaleForm(request.POST or None)
-    if form.is_valid():
-        dt_time = datetime.now()
-        sale, created = Sale.objects.get_or_create(store=form.cleaned_data['store'], sale_date=form.cleaned_data['sale_date'], defaults=dict(
-            sale=0, cost=0, created_at=dt_time))
-        sale.created_at = dt_time
-        sale.sale = form.cleaned_data['sale']
-        sale.cost = form.cleaned_data['cost']
-        sale.save()
-        return redirect('index')
-    return render(request, 'app/sale_add.html', {'form': form})
+class SaleCreateView(LoginRequiredMixin, CreateView):
+    model = Sale
+    form_class = SaleForm
+    success_url = reverse_lazy('index')
 
 # 更新画面
 
@@ -101,7 +93,7 @@ class SaleImport(generic.FormView):
         # 1行ずつ取り出し、作成していく
         for row in reader:
             sale, created = Sale.objects.get_or_create(
-                store=row[0], sale_date=row[1], defaults=dict(
+                store=row[0], sale_date=row[1], csv_import=True, defaults=dict(
                     store=row[0], sale=row[2], cost=row[3], created_at=dt_time)
             )
             sale.store = row[0]
@@ -111,9 +103,9 @@ class SaleImport(generic.FormView):
             if int(row[3]) != 0:
                 sale.cost = row[3]
             sale.created_at = dt_time
+            sale.csv_import = True
             sale.save()
         return super().form_valid(form)
-
 
 
 def sale_export(request):
@@ -153,7 +145,8 @@ def sale_df(df):
     df['粗利比'] = df['粗利比'].apply('{:.0%}'.format)
     df = df.round({'売上比': 1, '粗利比': 1})
     # 合計計算
-    df = df[['売上', '売上累計', '粗利', '粗利累計',  '前年売上', '前年売上累計',  '前年粗利','前年粗利累計', '売上比', '粗利比']]
+    df = df[['売上', '売上累計', '粗利', '粗利累計',  '前年売上',
+             '前年売上累計',  '前年粗利', '前年粗利累計', '売上比', '粗利比']]
     footer = df.sum()
     footer['売上累計'] = df.iloc[-1]['売上累計']
     footer['粗利累計'] = df.iloc[-1]['粗利累計']

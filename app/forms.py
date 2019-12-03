@@ -39,10 +39,6 @@ class CSVUploadForm(forms.Form):
         label='', help_text='※拡張子csvのファイルをアップロードしてください。')
 
 
-# 検索フォーム
-STORE_CHOICES = Sale.STORE_CHOICES
-
-
 def id_to_store(store_id):
     if store_id == 1:
         return '卸部門'
@@ -58,6 +54,18 @@ def id_to_store(store_id):
         return '思案橋店'
     elif store_id == 7:
         return 'ブライダル'
+
+
+STORE_CHOICES = (
+    (0, '全部門'),
+    (1, '卸部門'),
+    (2, '加工部門'),
+    (3, '配送部'),
+    (4, '観光通り店'),
+    (5, 'カロム店'),
+    (6, '思案橋店'),
+    (7, 'ブライダル'),
+)
 
 
 class MonthForm(forms.Form):
@@ -102,32 +110,3 @@ class YearForm(forms.Form):
         this_day = date.today()
         self.fields['Calc_Month'].initial = date(
             this_day.year, this_day.month, 1)
-
-
-class CreateSaleForm(forms.Form):
-    fields = ('store', 'sale_date', 'sale', 'cost')
-    store = forms.ChoiceField(
-        label='店舗名',
-        widget=forms.Select,
-        choices=Sale.STORE_CHOICES,
-        required=True,
-    )
-    sale_date = forms.DateField(
-        label='売上日',
-        required=True,
-        widget=datetimepicker.DatePickerInput(
-            format='%Y-%m-%d',
-            options={
-                'locale': 'ja',
-                'dayViewHeaderFormat': 'YYYY年 MMMM',
-            }
-        ),
-    )
-    sale = forms.IntegerField(
-        label='売上高',
-        required=True,
-    )
-    cost = forms.IntegerField(
-        label='仕入額',
-        required=True,
-    )
