@@ -52,7 +52,7 @@ form {
 
 @media screen and (max-width: 640px) {
     .filter {
-        width: 90%;
+        width: 100%;
     }
 
     .filter thead {
@@ -88,4 +88,11 @@ form {
     .filter tr {
         margin-bottom: 5px;
     }
+}
+
+.month_table {
+    display: block;
+    overflow-x: scroll;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
 }
