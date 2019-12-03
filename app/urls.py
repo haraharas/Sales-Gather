@@ -2,8 +2,7 @@ from django.urls import path
 from .views import SaleFilterView, SaleDetailView,  SaleUpdateView, SaleDeleteView, SaleMonthView, SaleImport, SaleYearView, SaleCreateView
 from django.contrib import admin
 from . import views
-from django.conf import settings
-from django.conf.urls.static import static
+
 admin.site.site_title = '売上集計システム'
 admin.site.site_header = '売上集計システム'
 admin.site.index_title = 'メニュー'
