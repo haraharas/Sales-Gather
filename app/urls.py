@@ -28,5 +28,3 @@ urlpatterns = [
     path('export/', views.sale_export, name='export'),
 
 ]
-
-urlpatterns += static(settings.CERT_URL, document_root=settings.CERT_ROOT)
