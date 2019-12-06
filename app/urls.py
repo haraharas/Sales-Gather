@@ -27,5 +27,5 @@ urlpatterns = [
     # CSVエクスポート
     path('export/', views.sale_export, name='export'),
     # ヘルプ
-    path('help/', views.SaleHelp, name='export'),
+    path('help/', views.SaleHelp, name='help'),
 ]
