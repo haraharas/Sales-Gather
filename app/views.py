@@ -323,3 +323,8 @@ def SaleYearView(request):
             'search_form': YearForm(),
         }
     return render(request, 'app/sale_year.html', param)
+
+
+def SaleHelp(request):
+    template_name = 'app/help.html'
+    return render(request, template_name)

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import SaleFilterView, SaleDetailView,  SaleUpdateView, SaleDeleteView, SaleMonthView, SaleImport, SaleYearView, SaleCreateView
+from .views import SaleFilterView, SaleDetailView,  SaleUpdateView, SaleDeleteView, SaleMonthView, SaleImport, SaleYearView, SaleCreateView, SaleHelp
 from django.contrib import admin
 from . import views
 from django.conf import settings
@@ -26,6 +26,8 @@ urlpatterns = [
     path('import/', views.SaleImport.as_view(), name='import'),
     # CSVエクスポート
     path('export/', views.sale_export, name='export'),
+    # ヘルプ
+    path('help/', views.SaleHelp, name='export'),
 ]
 
 urlpatterns += static(settings.CERT_URL, document_root=settings.CERT_ROOT)
