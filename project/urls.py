@@ -23,5 +23,3 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('app.urls')),
 ]
-
-urlpatterns += static(settings.CERT_URL, document_root=settings.CERT_ROOT)
