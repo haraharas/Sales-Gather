@@ -1,3 +1,4 @@
+from .forms import ContactForm
 from .models import Sale
 from .filters import SaleFilter
 from .forms import SaleForm, MonthForm, YearForm, id_to_store
@@ -325,6 +326,20 @@ def SaleYearView(request):
     return render(request, 'app/sale_year.html', param)
 
 
-def SaleHelp(request):
-    template_name = 'app/help.html'
-    return render(request, template_name)
+class ContactFormView(FormView):
+    template_name = 'app/contact_form.html'
+    form_class = ContactForm
+    success_url = reverse_lazy('contact_result')
+
+    def form_valid(self, form):
+        form.send_email()
+        return super().form_valid(form)
+
+
+class ContactResultView(TemplateView):
+    template_name = 'app/contact_result.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['success'] = "お問い合わせは正常に送信されました。"
+        return context

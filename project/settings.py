@@ -143,3 +143,10 @@ AUTH_USER_MODEL = 'account.User'
 
 CERT_ROOT = os.path.join(BASE_DIR, '.well-known')
 CERT_URL = '/.well-known/'
+
+
+EMAIL_HOST = 'mail49.heteml.jp'
+EMAIL_HOST_USER = 'info@offices.jp'
+EMAIL_HOST_PASSWORD = 'xuVnlxryEo5EdNnw'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
