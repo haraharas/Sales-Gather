@@ -12,11 +12,17 @@ from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
 
 
+@login_required
+def user_store(requset):
+    user = requset.user
+    return user.store
+
+
 class SaleForm(LoginRequiredMixin, forms.ModelForm):
 
     class Meta:
         model = Sale
-        fields = ('store', 'sale_date', 'sale', 'cost')
+        fields = ('store', 'sale_date', 'sale', 'cost', 'memo')
         widgets = {
             'store': forms.Select,
             'sale_date': datetimepicker.DatePickerInput(
@@ -28,6 +34,7 @@ class SaleForm(LoginRequiredMixin, forms.ModelForm):
             ),
             'sale': forms.NumberInput(attrs={'min': 1}),
             'cost': forms.NumberInput(attrs={'min': 1}),
+            'memo': forms.TextInput,
         }
     # __init__上でフィールドを初期化します
 
