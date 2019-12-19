@@ -36,7 +36,12 @@ class Sale(models.Model):
         blank=False,
         null=False,
     )
-
+    memo = models.CharField(
+        verbose_name='備考',
+        max_length=255,
+        blank=True,
+        null=True
+    )
     created_at = models.DateTimeField(
         verbose_name='更新日',
         auto_now_add=True
