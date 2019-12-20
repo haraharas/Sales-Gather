@@ -49,6 +49,7 @@
                     <th scope="col">売上日</th>
                     <th scope="col">売上高</th>
                     <th scope="col">仕入額</th>
+                    <th scope="col">備考</th>
                     <th class="visible-lg" scope="col">更新時間</th>
                     <th></th>
                 </tr>
@@ -65,6 +66,7 @@
                     <td data-label="売上日：">{{ sale.sale_date|date:"Y/m/d" }}</td>
                     <td data-label="売上高：">{{ sale.sale|intcomma }}円</td>
                     <td data-label="仕入額：">{{ sale.cost|intcomma }}円</td>
+                    <td data-label="備考：">{{ sale.memo }}</td>
                     <td data-label="更新日：" class="visible-lg">{{ sale.created_at}}</td>
                     <td class="text-right">
                         <div>
