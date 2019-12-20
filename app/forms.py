@@ -40,7 +40,6 @@ class SaleForm(LoginRequiredMixin, forms.ModelForm):
 
     def __init__(self, * args, **kwargs):
         super(SaleForm, self).__init__(*args, **kwargs)
-        self.fields['store'].initial = user_store
         self.fields['sale_date'].initial = date.today()
 
 
