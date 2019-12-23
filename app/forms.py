@@ -22,7 +22,7 @@ class SaleForm(LoginRequiredMixin, forms.ModelForm):
 
     class Meta:
         model = Sale
-        fields = ('store', 'sale_date', 'sale', 'cost', 'memo')
+        fields = ('store', 'sale_date', 'sale', 'cost')
         widgets = {
             'store': forms.Select,
             'sale_date': datetimepicker.DatePickerInput(
@@ -34,7 +34,6 @@ class SaleForm(LoginRequiredMixin, forms.ModelForm):
             ),
             'sale': forms.NumberInput(attrs={'min': 1}),
             'cost': forms.NumberInput(attrs={'min': 1}),
-            'memo': forms.TextInput,
         }
     # __init__上でフィールドを初期化します
 
