@@ -36,12 +36,6 @@ class Sale(models.Model):
         blank=False,
         null=False,
     )
-    memo = models.CharField(
-        verbose_name='備考',
-        max_length=255,
-        blank=True,
-        null=True
-    )
     created_at = models.DateTimeField(
         verbose_name='更新日',
         auto_now_add=True
@@ -50,9 +44,6 @@ class Sale(models.Model):
     csv_import = models.BooleanField(
         null=True,
     )
-
-    def __str__(self):
-        return self.memo
 
     class Meta:
         verbose_name = '売上'
