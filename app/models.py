@@ -51,6 +51,9 @@ class Sale(models.Model):
         null=True,
     )
 
+    def __str__(self):
+        return self.memo
+
     class Meta:
         verbose_name = '売上'
         verbose_name_plural = '売上'

@@ -14,8 +14,8 @@ from datetime import date, timedelta
 
 @login_required
 def user_store(requset):
-    user = requset.user
-    return user.store
+    user_store = requset.user
+    return user_store.id
 
 
 class SaleForm(LoginRequiredMixin, forms.ModelForm):
@@ -40,7 +40,6 @@ class SaleForm(LoginRequiredMixin, forms.ModelForm):
 
     def __init__(self, * args, **kwargs):
         super(SaleForm, self).__init__(*args, **kwargs)
-        self.fields['sale'].initial = 2
         self.fields['sale_date'].initial = date.today()
 
 
